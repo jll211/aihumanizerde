@@ -1,10 +1,10 @@
-import { Chart } from "lucide-react";
+import { ChartBar } from "lucide-react";
 
 const StyleAnalyzer = () => {
   return (
     <div className="bg-white p-6 rounded-xl max-w-lg mx-auto">
       <div className="flex items-center gap-3 mb-4">
-        <Chart className="w-6 h-6 text-primary" />
+        <ChartBar className="w-6 h-6 text-primary" />
         <h3 className="text-xl font-semibold">Style-Analyse Demo</h3>
       </div>
       <div className="space-y-4">
