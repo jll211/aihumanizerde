@@ -10,7 +10,7 @@ const Editor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
   };
 
@@ -34,11 +34,14 @@ const Editor = () => {
         body: JSON.stringify({ text: input }),
       });
 
-      if (!response.ok) throw new Error("Fehler beim Humanisieren");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       setOutput(data.humanizedText);
     } catch (error) {
+      console.error('Error:', error);
       toast({
         title: "Fehler",
         description: "Konnte den Text nicht humanisieren. Bitte versuche es später erneut.",
