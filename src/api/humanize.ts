@@ -31,7 +31,13 @@ export async function humanizeText(text: string) {
     const messages = await openai.beta.threads.messages.list(thread.id);
     const lastMessage = messages.data[0];
     
-    return lastMessage.content[0].text.value;
+    // Type check the content to ensure it's a text message
+    const messageContent = lastMessage.content[0];
+    if ('text' in messageContent) {
+      return messageContent.text.value;
+    }
+    
+    throw new Error("Unexpected message content type");
   } catch (error) {
     console.error("Error humanizing text:", error);
     throw error;
