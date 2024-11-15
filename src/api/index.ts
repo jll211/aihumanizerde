@@ -1,9 +1,8 @@
 import express from 'express';
 import { humanizeHandler } from './humanize';
 
-const app = express();
-app.use(express.json());
+const router = express.Router();
 
-app.post('/humanize', humanizeHandler);
+router.post('/humanize', humanizeHandler);
 
-export default app;
+export default router;
