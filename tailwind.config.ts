@@ -22,8 +22,8 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#0A0A0A",
+        foreground: "#FFFFFF",
         primary: {
           DEFAULT: "#3B82F6",
           foreground: "#FFFFFF",
@@ -37,25 +37,35 @@ export default {
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#F3F4F6",
-          foreground: "#6B7280",
+          DEFAULT: "#1A1A1A",
+          foreground: "#A1A1AA",
         },
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-wave': 'linear-gradient(90deg, #1E3A8A 0%, #3B82F6 50%, #1E3A8A 100%)',
+        'gradient-dark': 'linear-gradient(to right, #0A0A0A 0%, #1A1A1A 100%)',
+      },
       animation: {
-        "fade-in": "fadeIn 0.5s ease-out",
-        "slide-up": "slideUp 0.5s ease-out",
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'wave': 'wave 8s linear infinite',
       },
       keyframes: {
         fadeIn: {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
         slideUp: {
-          "0%": { transform: "translateY(20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        wave: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '200% 50%' },
         },
       },
     },

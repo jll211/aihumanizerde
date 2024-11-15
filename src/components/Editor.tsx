@@ -53,31 +53,31 @@ const Editor = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold mb-2">Original</h3>
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="bg-muted rounded-xl p-6 border border-gray-800">
+          <h3 className="text-lg font-semibold mb-4 text-blue-400">Original</h3>
           <Textarea
-            className="w-full min-h-[400px] p-2 border rounded resize-none"
+            className="w-full min-h-[500px] bg-background border-gray-800 rounded-lg resize-none font-mono text-sm"
             value={input}
             onChange={handleInputChange}
             placeholder="Füge deinen KI-generierten Text hier ein..."
           />
         </div>
-        <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold mb-2">Humanisiert</h3>
-          <div className="w-full min-h-[400px] p-2 border rounded bg-muted overflow-y-auto whitespace-pre-wrap">
+        <div className="bg-muted rounded-xl p-6 border border-gray-800">
+          <h3 className="text-lg font-semibold mb-4 text-purple-400">Humanisiert</h3>
+          <div className="w-full min-h-[500px] bg-background border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
             {output || "Dein humanisierter Text erscheint hier..."}
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-center">
+      <div className="mt-8 flex justify-center">
         <Button 
           onClick={handleHumanize} 
           disabled={isLoading}
-          className="button-primary"
+          className="px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full text-lg font-medium transition-all duration-300"
         >
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
           Text humanisieren
         </Button>
       </div>
