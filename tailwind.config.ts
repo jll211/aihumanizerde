@@ -42,17 +42,25 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Montserrat", "sans-serif"],
+        heading: ["Montserrat", "sans-serif"],
+      },
+      letterSpacing: {
+        tighter: '-0.05em',
+        tight: '-0.025em',
       },
       backgroundImage: {
+        'hero-pattern': "url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=80')",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-wave': 'linear-gradient(90deg, #1E3A8A 0%, #3B82F6 50%, #1E3A8A 100%)',
-        'gradient-dark': 'linear-gradient(to right, #0A0A0A 0%, #1A1A1A 100%)',
+        'gradient-premium': 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 0.5s ease-out',
         'wave': 'wave 8s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: {
@@ -66,6 +74,10 @@ export default {
         wave: {
           '0%': { backgroundPosition: '0% 50%' },
           '100%': { backgroundPosition: '200% 50%' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
         },
       },
     },

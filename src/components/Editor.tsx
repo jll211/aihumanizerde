@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
 import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 
 const Editor = () => {
   const [input, setInput] = useState("");
@@ -40,6 +41,11 @@ const Editor = () => {
 
       const data = await response.json();
       setOutput(data.humanizedText);
+      
+      toast({
+        title: "Erfolg!",
+        description: "Dein Text wurde erfolgreich humanisiert.",
+      });
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -53,35 +59,59 @@ const Editor = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-7xl mx-auto p-6"
+    >
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-muted rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-blue-400">Original</h3>
+        <motion.div 
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="bg-gradient-premium rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+        >
+          <h3 className="text-lg font-semibold mb-4 text-blue-400 tracking-tight">Original</h3>
           <Textarea
-            className="w-full min-h-[500px] bg-background border-gray-800 rounded-lg resize-none font-mono text-sm"
+            className="w-full h-[600px] bg-background/50 backdrop-blur-sm border-gray-800 rounded-lg resize-none font-mono text-sm"
             value={input}
             onChange={handleInputChange}
             placeholder="Füge deinen KI-generierten Text hier ein..."
           />
-        </div>
-        <div className="bg-muted rounded-xl p-6 border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-purple-400">Humanisiert</h3>
-          <div className="w-full min-h-[500px] bg-background border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
+        </motion.div>
+        <motion.div 
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gradient-premium rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+        >
+          <h3 className="text-lg font-semibold mb-4 text-purple-400 tracking-tight">Humanisiert</h3>
+          <div className="w-full h-[600px] bg-background/50 backdrop-blur-sm border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
             {output || "Dein humanisierter Text erscheint hier..."}
           </div>
-        </div>
+        </motion.div>
       </div>
-      <div className="mt-8 flex justify-center">
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="mt-8 flex justify-center"
+      >
         <Button 
           onClick={handleHumanize} 
           disabled={isLoading}
-          className="px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full text-lg font-medium transition-all duration-300"
+          className="group px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full text-lg font-semibold tracking-tight transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
         >
-          {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+          {isLoading ? (
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+          ) : (
+            <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+          )}
           Text humanisieren
         </Button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

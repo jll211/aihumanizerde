@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,10 +9,14 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  @apply bg-gradient-to-r from-blue-600 to-purple-600;
 }
 
 .card-hover {
@@ -20,11 +24,19 @@
 }
 
 .button-primary {
-  @apply bg-primary text-white px-6 py-3 rounded-lg font-medium 
-         hover:bg-primary/90 transition-colors duration-200;
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full font-semibold 
+         hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105 transition-all duration-300;
 }
 
 .button-secondary {
-  @apply bg-secondary text-white px-6 py-3 rounded-lg font-medium 
-         hover:bg-secondary/90 transition-colors duration-200;
+  @apply bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-3 rounded-full font-semibold 
+         hover:shadow-lg hover:shadow-gray-500/25 hover:scale-105 transition-all duration-300;
+}
+
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-lg;
+}
+
+.premium-border {
+  @apply border border-gray-800 hover:border-blue-500/50 transition-colors duration-300;
 }
