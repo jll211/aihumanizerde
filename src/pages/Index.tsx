@@ -21,7 +21,7 @@ const Index = () => {
         </h2>
         <Editor />
       </div>
-      <div className="py-20 bg-muted">
+      <div className="py-20 bg-gradient-to-b from-background via-muted to-background">
         <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">
           Verstehe deinen Stil
         </h2>
