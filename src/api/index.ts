@@ -1,21 +1,9 @@
-import { humanizeText } from './humanize';
 import express from 'express';
+import { humanizeHandler } from './humanize';
 
-const router = express.Router();
+const app = express();
+app.use(express.json());
 
-router.post('/humanize', async (req, res) => {
-  try {
-    const { text } = req.body;
-    if (!text) {
-      return res.status(400).json({ error: 'Text is required' });
-    }
+app.post('/humanize', humanizeHandler);
 
-    const humanizedText = await humanizeText(text);
-    res.json({ humanizedText });
-  } catch (error) {
-    console.error('Error in humanize endpoint:', error);
-    res.status(500).json({ error: 'Failed to humanize text' });
-  }
-});
-
-export default router;
+export default app;
