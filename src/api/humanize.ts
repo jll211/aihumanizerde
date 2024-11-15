@@ -32,7 +32,6 @@ export async function humanizeText(text: string) {
     const messages = await openai.beta.threads.messages.list(thread.id);
     const lastMessage = messages.data[0];
     
-    // Type check the content to ensure it's a text message
     const messageContent = lastMessage.content[0];
     if ('text' in messageContent) {
       return messageContent.text.value;
@@ -45,11 +44,12 @@ export async function humanizeText(text: string) {
   }
 }
 
-export const humanizeHandler = async (req: Request, res: Response) => {
+export const humanizeHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const { text } = req.body;
     if (!text) {
-      return res.status(400).json({ error: 'Text is required' });
+      res.status(400).json({ error: 'Text is required' });
+      return;
     }
 
     const humanizedText = await humanizeText(text);
