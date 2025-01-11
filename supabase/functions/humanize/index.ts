@@ -3,20 +3,14 @@ import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.14.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS', 
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 }
 
 const extractHumanizedText = (content: string) => {
-  console.log('Raw response from Claude:', content.substring(0, 500) + '...');
   const match = content.match(/<humanized_text>([\s\S]*?)<\/humanized_text>/);
-  console.log('Extraction attempt:', {
-    hasMatch: !!match,
-    matchLength: match?.[1]?.length
-  });
-  
   if (!match) {
-    console.log('No tagged content found, checking if response is direct text');
+    console.log('No tagged content found, using raw response');
     return content.trim();
   }
   return match[1].trim();
@@ -145,26 +139,23 @@ Remember:
 
 Your goal is to create text that sounds natural and human-written while preserving the original meaning, intent, and tone.
 
-Please provide ONLY the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
+Please provide only the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
       }]
     });
 
-    console.log('Anthropic response received:', {
-      status: 'success',
-      responseLength: message.content.length
-    });
-
+    console.log('Raw Anthropic response:', message.content[0].text);
+    
     const content = message.content[0].text;
     let humanizedText;
     try {
       humanizedText = extractHumanizedText(content);
-      console.log('Successfully extracted humanized text:', {
-        length: humanizedText.length,
-        preview: humanizedText.substring(0, 100) + '...'
-      });
+      console.log('Full extracted text:', humanizedText);
     } catch (error) {
-      console.error('Error extracting humanized text:', error);
-      throw new Error('Failed to extract humanized text from response');
+      console.error('Full error details:', {
+        error: error.message,
+        originalContent: content
+      });
+      throw error;
     }
 
     return new Response(
