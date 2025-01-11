@@ -9,7 +9,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      jsxImportSource: 'react',
+      tsDecorators: true,
+    }),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
@@ -22,6 +25,7 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
     commonjsOptions: {
       include: [],
+      transformMixedEsModules: true,
     },
   },
   optimizeDeps: {
