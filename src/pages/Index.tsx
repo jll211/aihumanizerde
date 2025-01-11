@@ -8,25 +8,37 @@ import Logo from "../components/Logo";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background">
       <div className="p-6">
         <Logo />
       </div>
-      <Hero />
-      <Features />
-      <Discover />
-      <div className="py-20">
-        <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">
-          Erlebe den Unterschied
-        </h2>
+      
+      <div className="max-w-6xl mx-auto px-4 py-20">
+        <h1 className="text-7xl md:text-8xl font-extrabold tracking-tighter text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 animate-pulse-slow mb-8">
+          Elevate AI to
+          <br />
+          Human Perfection
+        </h1>
+        
+        <p className="text-xl md:text-2xl text-center text-gray-300 max-w-2xl mx-auto font-light tracking-tight mb-12">
+          Bypass AI detection with the world's most powerful AI Humanizer.
+        </p>
+
         <Editor />
       </div>
-      <div className="py-20 bg-gradient-to-b from-background via-muted to-background">
-        <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">
-          Verstehe deinen Stil
-        </h2>
+
+      <div className="py-20">
+        <Features />
+      </div>
+
+      <div className="py-20">
+        <Discover />
+      </div>
+
+      <div className="py-20">
         <StyleAnalyzer />
       </div>
+
       <CTAButton />
     </div>
   );
