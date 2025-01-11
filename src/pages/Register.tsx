@@ -39,7 +39,7 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8 bg-background/80 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
-        <div className="text-center">
+        <div className="text-center text-foreground">
           <h2 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
             Jetzt registrieren
           </h2>
@@ -63,13 +63,16 @@ const Register = () => {
                 colors: {
                   brand: '#6366f1',
                   brandAccent: '#4f46e5',
+                  inputText: 'white',
                 }
               }
             },
             className: {
-              container: 'space-y-4',
+              container: 'space-y-4 text-foreground',
               button: 'w-full px-4 py-2 rounded-md',
               divider: 'my-4',
+              input: 'text-white bg-background',
+              label: 'text-foreground',
             }
           }}
           providers={["google"]}
