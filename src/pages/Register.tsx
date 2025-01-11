@@ -122,6 +122,10 @@ const Register = () => {
                   brand: '#6366f1',
                   brandAccent: '#4f46e5',
                   inputText: 'white',
+                  inputBackground: 'transparent',
+                  inputBorder: '#374151',
+                  inputLabelText: 'white',
+                  inputPlaceholder: '#9CA3AF',
                 }
               }
             },
@@ -129,9 +133,10 @@ const Register = () => {
               container: 'space-y-4 text-foreground',
               button: 'w-full px-4 py-2 rounded-md',
               divider: 'my-4',
-              input: 'text-white bg-background',
-              label: 'text-foreground',
-              message: 'text-destructive',
+              input: 'text-white bg-transparent border-gray-700',
+              label: 'text-white',
+              message: 'text-red-400',
+              anchor: 'text-blue-400 hover:text-blue-300',
             }
           }}
           providers={["google"]}
