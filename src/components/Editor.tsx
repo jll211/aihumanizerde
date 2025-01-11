@@ -88,12 +88,12 @@ const Editor = () => {
       <div className="mb-6 flex justify-start">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-48">
+            <Button variant="outline" className="w-48 bg-background border-gray-800">
               {TEXT_TYPES[selectedType]}
               <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
+          <DropdownMenuContent className="w-48 bg-background border-gray-800">
             {Object.entries(TEXT_TYPES).map(([key, value]) => (
               <DropdownMenuItem
                 key={key}
@@ -112,11 +112,11 @@ const Editor = () => {
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-premium rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
         >
           <h3 className="text-lg font-semibold mb-4 text-blue-400 tracking-tight">Original</h3>
           <Textarea
-            className="w-full h-[600px] bg-background/50 backdrop-blur-sm border-gray-800 rounded-lg resize-none font-mono text-sm"
+            className="w-full h-[600px] bg-background border-gray-800 rounded-lg resize-none font-mono text-sm"
             value={input}
             onChange={handleInputChange}
             placeholder="Füge deinen KI-generierten Text hier ein..."
@@ -126,10 +126,10 @@ const Editor = () => {
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-gradient-premium rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
         >
           <h3 className="text-lg font-semibold mb-4 text-purple-400 tracking-tight">Humanisiert</h3>
-          <div className="w-full h-[600px] bg-background/50 backdrop-blur-sm border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
+          <div className="w-full h-[600px] bg-background border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
             {output || "Dein humanisierter Text erscheint hier..."}
           </div>
         </motion.div>
