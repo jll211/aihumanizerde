@@ -17,7 +17,7 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            Transform your AI-generated content into natural, human-like text.
+            Verwandle KI-generierten Content in natürlich klingende Texte.
           </motion.p>
         </div>
       </motion.div>

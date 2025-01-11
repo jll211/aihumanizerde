@@ -14,7 +14,7 @@ const StyleAnalyzer = () => {
           <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
             <ChartBar className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-bold text-white">Style Analysis</h3>
+          <h3 className="text-xl font-bold text-white">Stilanalyse</h3>
         </div>
 
         <div className="space-y-6">
