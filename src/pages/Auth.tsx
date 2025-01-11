@@ -68,6 +68,7 @@ const Auth = () => {
                 colors: {
                   brand: '#6366f1',
                   brandAccent: '#4f46e5',
+                  inputText: 'white',
                 }
               }
             },
@@ -75,6 +76,7 @@ const Auth = () => {
               container: 'space-y-4',
               button: 'w-full px-4 py-2 rounded-md',
               divider: 'my-4',
+              input: 'text-white bg-background',
             }
           }}
           providers={["google"]}
