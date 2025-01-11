@@ -1,40 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import Header from "../components/header/Header";
 import MainContent from "../components/home/MainContent";
 import Features from "../components/Features";
 import StyleAnalyzer from "../components/StyleAnalyzer";
 import CTAButton from "../components/CTAButton";
 import Discover from "../components/Discover";
+import { useAuth } from "../providers/AuthProvider";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { session, isLoading } = useAuth();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log("Current session:", session);
-        setIsAuthenticated(!!session);
-      } catch (error) {
-        console.error("Error checking session:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, !!session);
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    if (!isLoading && !session) {
+      console.log("No session found, redirecting to auth page");
+      navigate("/auth");
+    }
+  }, [session, isLoading, navigate]);
 
   if (isLoading) {
     return (
@@ -47,8 +30,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background">
       <Header 
-        isAuthenticated={isAuthenticated} 
-        setIsAuthenticated={setIsAuthenticated}
+        isAuthenticated={!!session} 
+        setIsAuthenticated={(value) => {
+          if (!value) {
+            supabase.auth.signOut();
+          }
+        }}
       />
       
       <MainContent />
