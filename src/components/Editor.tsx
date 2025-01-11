@@ -79,9 +79,10 @@ const Editor = () => {
         .from('free_transformations')
         .select('id')
         .eq('ip_address', clientIP)
-        .single();
+        .maybeSingle();
 
-      if (queryError && queryError.code !== 'PGRST116') { // PGRST116 means no rows found
+      if (queryError) {
+        console.error('Error querying free transformations:', queryError);
         throw queryError;
       }
 
@@ -93,7 +94,7 @@ const Editor = () => {
       // If IP hasn't been used, insert it
       const { error: insertError } = await supabase
         .from('free_transformations')
-        .insert([{ ip_address: clientIP }]);
+        .insert({ ip_address: clientIP });
 
       if (insertError) throw insertError;
 
