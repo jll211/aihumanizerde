@@ -27,9 +27,9 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
             console.log("Checking if profile exists for user:", session.user.id);
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
-              .select('*')
+              .select()
               .eq('id', session.user.id)
-              .maybeSingle();
+              .single();
 
             if (profileError) {
               console.error("Profile check error:", profileError);
@@ -40,11 +40,11 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
               console.log("Creating new profile for user:", session.user.id);
               const { error: insertError } = await supabase
                 .from('profiles')
-                .insert([{ 
-                  id: session.user.id, 
+                .insert({
+                  id: session.user.id,
                   username: session.user.email,
                   updated_at: new Date().toISOString()
-                }]);
+                });
 
               if (insertError) {
                 console.error("Profile creation error:", insertError);
