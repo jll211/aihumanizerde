@@ -17,7 +17,12 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.error("Session check error:", sessionError);
+          throw sessionError;
+        }
+        
         if (session) {
           console.log("User already logged in, redirecting to homepage");
           navigate("/");
@@ -35,13 +40,43 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, session);
+        
         if (event === "SIGNED_IN") {
-          console.log("User signed in, redirecting to homepage");
-          toast({
-            title: "Erfolgreich eingeloggt",
-            description: "Willkommen zurück!",
-          });
-          navigate("/");
+          try {
+            // Check if profile exists
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session?.user?.id)
+              .single();
+
+            if (profileError) {
+              console.error("Profile check error:", profileError);
+              throw profileError;
+            }
+
+            if (!profile) {
+              console.log("Creating new profile for user");
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert([{ id: session?.user?.id, username: session?.user?.email }]);
+
+              if (insertError) {
+                console.error("Profile creation error:", insertError);
+                throw insertError;
+              }
+            }
+
+            console.log("User signed in successfully, redirecting to homepage");
+            toast({
+              title: "Erfolgreich eingeloggt",
+              description: "Willkommen zurück!",
+            });
+            navigate("/");
+          } catch (error) {
+            console.error("Error during sign in process:", error);
+            setErrorMessage("Ein Fehler ist bei der Profilverarbeitung aufgetreten.");
+          }
         } else if (event === "SIGNED_OUT") {
           setErrorMessage("");
         } else if (event === "USER_UPDATED") {
