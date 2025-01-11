@@ -186,7 +186,7 @@ const Auth = () => {
             }
           }}
           providers={["google"]}
-          redirectTo={window.location.origin}
+          redirectTo={typeof window !== 'undefined' ? window.location.origin : 'https://aihumanizerde.lovable.app'}
           view="sign_in"
         />
       </div>
