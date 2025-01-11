@@ -54,12 +54,17 @@ const Editor = () => {
 
       if (error) throw error;
 
-      setOutput(data.humanizedText);
-      
-      toast({
-        title: "Erfolg!",
-        description: "Dein Text wurde erfolgreich humanisiert.",
-      });
+      // Make sure we're accessing the humanizedText property from the response
+      if (data && typeof data.humanizedText === 'string') {
+        setOutput(data.humanizedText);
+        
+        toast({
+          title: "Erfolg!",
+          description: "Dein Text wurde erfolgreich humanisiert.",
+        });
+      } else {
+        throw new Error('Invalid response format from server');
+      }
     } catch (error) {
       console.error('Error:', error);
       toast({
