@@ -17,7 +17,9 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        console.log("Checking session...");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
         if (sessionError) {
           console.error("Session check error:", sessionError);
           throw sessionError;
@@ -43,12 +45,17 @@ const Auth = () => {
         
         if (event === "SIGNED_IN") {
           try {
-            // Check if profile exists
+            if (!session?.user?.id) {
+              console.error("No user ID in session");
+              throw new Error("No user ID found in session");
+            }
+
+            console.log("Checking if profile exists for user:", session.user.id);
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
               .select('*')
-              .eq('id', session?.user?.id)
-              .single();
+              .eq('id', session.user.id)
+              .maybeSingle();
 
             if (profileError) {
               console.error("Profile check error:", profileError);
@@ -56,10 +63,14 @@ const Auth = () => {
             }
 
             if (!profile) {
-              console.log("Creating new profile for user");
+              console.log("Creating new profile for user:", session.user.id);
               const { error: insertError } = await supabase
                 .from('profiles')
-                .insert([{ id: session?.user?.id, username: session?.user?.email }]);
+                .insert([{ 
+                  id: session.user.id, 
+                  username: session.user.email,
+                  updated_at: new Date().toISOString()
+                }]);
 
               if (insertError) {
                 console.error("Profile creation error:", insertError);
@@ -67,7 +78,7 @@ const Auth = () => {
               }
             }
 
-            console.log("User signed in successfully, redirecting to homepage");
+            console.log("Sign in process completed successfully");
             toast({
               title: "Erfolgreich eingeloggt",
               description: "Willkommen zurück!",
@@ -76,20 +87,20 @@ const Auth = () => {
           } catch (error) {
             console.error("Error during sign in process:", error);
             setErrorMessage("Ein Fehler ist bei der Profilverarbeitung aufgetreten.");
+            // Attempt to sign out the user if profile creation failed
+            await supabase.auth.signOut();
           }
         } else if (event === "SIGNED_OUT") {
+          console.log("User signed out");
           setErrorMessage("");
-        } else if (event === "USER_UPDATED") {
-          const { error } = await supabase.auth.getSession();
-          if (error) {
-            console.error("Session error:", error);
-            setErrorMessage(getErrorMessage(error));
-          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, [navigate, toast]);
 
   const getErrorMessage = (error: AuthError) => {
@@ -107,12 +118,6 @@ const Auth = () => {
           if (error.message.includes("User already registered")) {
             return "Diese E-Mail-Adresse wird bereits verwendet.";
           }
-          if (error.message.includes("Invalid login credentials")) {
-            return "Ungültige E-Mail oder Passwort.";
-          }
-          if (error.message.includes("Database error")) {
-            return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
-          }
           return "Ungültige Eingaben. Bitte überprüfen Sie Ihre Daten.";
         case 422:
           return "Diese E-Mail-Adresse wird bereits verwendet.";
@@ -121,10 +126,6 @@ const Auth = () => {
         case 500:
           return "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
         default:
-          if (error.message.includes("Database error")) {
-            console.error("Database error details:", error);
-            return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
-          }
           return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
       }
     }
