@@ -21,8 +21,10 @@ const TEXT_TYPES = {
 
 type TextType = keyof typeof TEXT_TYPES;
 
-// Get the API URL from environment variables, fallback to localhost for development
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// In development, use the Supabase Edge Function URL
+const API_URL = import.meta.env.PROD 
+  ? 'https://akbfexwiejfddvjmeofn.supabase.co/functions/v1/humanize'
+  : 'http://localhost:3000/api/humanize';
 
 const Editor = () => {
   const [input, setInput] = useState("");
@@ -47,11 +49,12 @@ const Editor = () => {
 
     setIsLoading(true);
     try {
-      console.log('Making request to:', `${API_URL}/api/humanize`);
-      const response = await fetch(`${API_URL}/api/humanize`, {
+      console.log('Making request to:', API_URL);
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({ 
           text: input,
