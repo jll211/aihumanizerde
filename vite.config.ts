@@ -24,4 +24,7 @@ export default defineConfig(({ mode }) => ({
       include: [],
     },
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
 }));
