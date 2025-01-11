@@ -1,4 +1,11 @@
 import * as React from 'react';
+const {
+  createContext,
+  useState,
+  useCallback,
+  useEffect,
+  useContext
+} = React;
 
 export type Toast = {
   id: string;
@@ -14,25 +21,25 @@ type ToastContextType = {
   removeToast: (id: string) => void;
 };
 
-const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function useToast() {
-  const [toasts, setToasts] = React.useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = React.useCallback((toast: Omit<Toast, "id">) => {
+  const addToast = useCallback((toast: Omit<Toast, "id">) => {
     setToasts((currentToasts) => [
       ...currentToasts,
       { ...toast, id: Math.random().toString(36).slice(2) },
     ]);
   }, []);
 
-  const removeToast = React.useCallback((id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts((currentToasts) =>
       currentToasts.filter((toast) => toast.id !== id)
     );
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       if (toasts.length > 0) {
         removeToast(toasts[0].id);
@@ -56,7 +63,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function toast(props: Omit<Toast, "id">) {
-  const context = React.useContext(ToastContext);
+  const context = useContext(ToastContext);
   if (!context) {
     throw new Error("useToast must be used within a ToastProvider");
   }
