@@ -9,12 +9,16 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Explicitly set React refresh
+      fastRefresh: true,
+    }),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react": "react", // Ensure React is properly resolved
     },
   },
   build: {
