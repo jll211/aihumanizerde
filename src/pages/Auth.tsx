@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -56,7 +55,7 @@ const Auth = () => {
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
-              .single();
+              .maybeSingle();
 
             if (profileError) {
               console.error("Profile check error:", profileError);
@@ -67,11 +66,11 @@ const Auth = () => {
               console.log("Creating new profile for user:", session.user.id);
               const { error: insertError } = await supabase
                 .from('profiles')
-                .insert({
-                  id: session.user.id,
+                .insert([{ 
+                  id: session.user.id, 
                   username: session.user.email,
-                  updated_at: new Date().toISOString(),
-                } satisfies Database['public']['Tables']['profiles']['Insert']);
+                  updated_at: new Date().toISOString()
+                }]);
 
               if (insertError) {
                 console.error("Profile creation error:", insertError);
@@ -88,6 +87,7 @@ const Auth = () => {
           } catch (error) {
             console.error("Error during sign in process:", error);
             setErrorMessage("Ein Fehler ist bei der Profilverarbeitung aufgetreten.");
+            // Attempt to sign out the user if profile creation failed
             await supabase.auth.signOut();
           }
         } else if (event === "SIGNED_OUT") {

@@ -42,46 +42,46 @@ const Editor = () => {
     navigate("/register");
   };
 
-const checkFreeTransformation = async () => {
-  try {
-    const { data: ipData, error: ipError } = await supabase.functions.invoke(
-      "get-client-ip"
-    );
+  const checkFreeTransformation = async () => {
+    try {
+      const { data: ipData, error: ipError } = await supabase.functions.invoke(
+        "get-client-ip"
+      );
 
-    if (ipError) throw ipError;
+      if (ipError) throw ipError;
 
-    const clientIP = ipData.ip;
-    console.log("Client IP:", clientIP);
+      const clientIP = ipData.ip;
+      console.log("Client IP:", clientIP);
 
-    const { data: existingTransformation, error: queryError } = await supabase
-      .from("free_transformations")
-      .select("id")
-      .eq("ip_address", clientIP)
-      .maybeSingle();
+      const { data: existingTransformation, error: queryError } = await supabase
+        .from("free_transformations")
+        .select("id")
+        .eq("ip_address", clientIP)
+        .maybeSingle();
 
-    if (queryError) {
-      console.error("Error querying free transformations:", queryError);
-      throw queryError;
-    }
+      if (queryError) {
+        console.error("Error querying free transformations:", queryError);
+        throw queryError;
+      }
 
-    if (existingTransformation) {
-      console.log("IP has already used free transformation");
+      if (existingTransformation) {
+        console.log("IP has already used free transformation");
+        return false;
+      }
+
+      const { error: insertError } = await supabase
+        .from("free_transformations")
+        .insert({ ip_address: clientIP });
+
+      if (insertError) throw insertError;
+
+      console.log("New IP recorded for free transformation");
+      return true;
+    } catch (error) {
+      console.error("Error checking free transformation:", error);
       return false;
     }
-
-    const { error: insertError } = await supabase
-      .from("free_transformations")
-      .insert({ ip_address: clientIP } as any);
-
-    if (insertError) throw insertError;
-
-    console.log("New IP recorded for free transformation");
-    return true;
-  } catch (error) {
-    console.error("Error checking free transformation:", error);
-    return false;
-  }
-};
+  };
 
   const handleHumanize = async () => {
     if (!input.trim()) {

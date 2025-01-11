@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getErrorMessage } from "@/utils/auth/errorHandling";
-import type { Database } from "@/integrations/supabase/types";
 
 interface AuthStateHandlerProps {
   setErrorMessage: (message: string) => void;
@@ -30,7 +29,7 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
-              .single();
+              .maybeSingle();
 
             if (profileError) {
               console.error("Profile check error:", profileError);
@@ -41,11 +40,11 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
               console.log("Creating new profile for user:", session.user.id);
               const { error: insertError } = await supabase
                 .from('profiles')
-                .insert({
-                  id: session.user.id,
+                .insert([{ 
+                  id: session.user.id, 
                   username: session.user.email,
-                  updated_at: new Date().toISOString(),
-                } satisfies Database['public']['Tables']['profiles']['Insert']);
+                  updated_at: new Date().toISOString()
+                }]);
 
               if (insertError) {
                 console.error("Profile creation error:", insertError);
