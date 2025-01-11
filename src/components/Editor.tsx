@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
 
 const TEXT_TYPES = {
   standard: "Standard",
@@ -20,9 +21,6 @@ const TEXT_TYPES = {
 } as const;
 
 type TextType = keyof typeof TEXT_TYPES;
-
-// In development, use the Supabase Edge Function URL
-const API_URL = 'https://akbfexwiejfddvjmeofn.supabase.co/functions/v1/humanize';
 
 const Editor = () => {
   const [input, setInput] = useState("");
@@ -47,24 +45,15 @@ const Editor = () => {
 
     setIsLoading(true);
     try {
-      console.log('Making request to:', API_URL);
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({ 
+      const { data, error } = await supabase.functions.invoke('humanize', {
+        body: { 
           text: input,
           type: selectedType 
-        }),
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (error) throw error;
 
-      const data = await response.json();
       setOutput(data.humanizedText);
       
       toast({

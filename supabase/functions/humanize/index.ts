@@ -22,6 +22,8 @@ serve(async (req) => {
       )
     }
 
+    console.log('Received request:', { type, textLength: text.length });
+
     const anthropic = new Anthropic({
       apiKey: Deno.env.get('ANTHROPIC_API_KEY'),
     });
@@ -67,42 +69,13 @@ General guidelines for humanizing the text:
 9. Preserve the style and tone of the original, even if specific instructions below may state otherwise.
 10. Include 1-2 minimal grammar or spelling errors to enhance the human feel (but don't overdo it).
 
-Specific instructions based on text type (apply these in addition to the general guidelines, not in place of them):
-
-For blog articles:
-- Use a conversational tone while maintaining professionalism.
-- Include personal anecdotes or examples where appropriate.
-- Break up long paragraphs into shorter, more digestible chunks.
-
-For professional/business emails:
-- Maintain a formal yet friendly tone.
-- Use appropriate salutations and closings.
-- Be concise and to the point while remaining polite.
-- Aim for short emails with a focus on clarity.
-- Keep salutation and closing as they were before.
-- Preserve the original German formal/informal address ('Du' or 'Sie').
-
-For academic texts:
-- Maintain a formal and objective tone.
-- Use field-specific terminology where necessary.
-- Rephrase content to avoid potential plagiarism issues.
-- Preserve citations and references.
-- Aim for a similar length and style while re-structuring sentences to avoid plagiarism.
-
-For social media posts:
-- Adapt the tone to fit the specific platform (e.g., more casual for Instagram, more professional for LinkedIn).
-- Keep the content concise and engaging.
-- Use hashtags sparingly and only when relevant.
-- Encourage interaction without being overly promotional.
-- Do not use emojis unless explicitly requested by the user.
-
-For standard text (without a specific text type):
-- Apply all general humanization guidelines.
-- Maintain the original tone and content of the text.
-- Adapt the language to sound natural and human-written without changing the overall style or purpose of the text.
-
 Please provide only the humanized text without any additional commentary or explanations.`
       }]
+    });
+
+    console.log('Anthropic response received:', { 
+      status: 'success',
+      responseLength: message.content.length 
     });
 
     return new Response(
@@ -110,7 +83,7 @@ Please provide only the humanized text without any additional commentary or expl
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: 'Failed to humanize text' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
