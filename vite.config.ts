@@ -28,5 +28,8 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
+    esbuildOptions: {
+      target: 'es2020'
+    }
   },
 }));
