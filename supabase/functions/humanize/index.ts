@@ -8,11 +8,15 @@ const corsHeaders = {
 }
 
 const extractHumanizedText = (content: string) => {
+  // Direkter Versuch die Tags zu finden
   const match = content.match(/<humanized_text>([\s\S]*?)<\/humanized_text>/);
+  
   if (!match) {
-    console.log('No tagged content found, using raw response');
+    // Wenn keine Tags gefunden, gib den kompletten Text zurück
     return content.trim();
   }
+  
+  // Nur den Inhalt zwischen den Tags
   return match[1].trim();
 };
 
