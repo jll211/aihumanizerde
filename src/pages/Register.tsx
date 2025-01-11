@@ -62,8 +62,6 @@ const Register = () => {
           providers={["google"]}
           redirectTo={window.location.origin}
           view="sign_up"
-          // Wichtig: Nur die minimal notwendigen Optionen übergeben
-          // Keine zusätzlichen Felder oder Optionen, die nicht von Supabase erwartet werden
         />
       </div>
     </div>
