@@ -3,21 +3,39 @@ import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.14.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS', 
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 }
 
+const extractHumanizedText = (content: string) => {
+  console.log('Raw response from Claude:', content.substring(0, 500) + '...');
+  const match = content.match(/<humanized_text>([\s\S]*?)<\/humanized_text>/);
+  console.log('Extraction attempt:', {
+    hasMatch: !!match,
+    matchLength: match?.[1]?.length
+  });
+  
+  if (!match) {
+    console.log('No tagged content found, checking if response is direct text');
+    return content.trim();
+  }
+  return match[1].trim();
+};
+
 serve(async (req) => {
   console.log('Received request:', req.method, req.url);
-  console.log('Request headers:', Object.fromEntries(req.headers.entries()));
-
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const { text, type = 'standard' } = await req.json();
-    console.log('Processing request with:', { type, textLength: text?.length });
+    console.log('Processing request:', { 
+      type, 
+      textLength: text?.length,
+      textPreview: text?.substring(0, 100) + '...'
+    });
 
     if (!text) {
       console.error('Missing text in request');
@@ -127,20 +145,27 @@ Remember:
 
 Your goal is to create text that sounds natural and human-written while preserving the original meaning, intent, and tone.
 
-Please provide only the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
+Please provide ONLY the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
       }]
     });
 
-    console.log('Received response from Anthropic:', {
+    console.log('Anthropic response received:', {
       status: 'success',
       responseLength: message.content.length
     });
 
-    // Extract the humanized text from the response
     const content = message.content[0].text;
-    const humanizedText = content.match(/<humanized_text>([\s\S]*?)<\/humanized_text>/)?.[1]?.trim() || content;
-    
-    console.log('Extracted humanized text:', humanizedText);
+    let humanizedText;
+    try {
+      humanizedText = extractHumanizedText(content);
+      console.log('Successfully extracted humanized text:', {
+        length: humanizedText.length,
+        preview: humanizedText.substring(0, 100) + '...'
+      });
+    } catch (error) {
+      console.error('Error extracting humanized text:', error);
+      throw new Error('Failed to extract humanized text from response');
+    }
 
     return new Response(
       JSON.stringify({ humanizedText }),
@@ -152,9 +177,12 @@ Please provide only the content within the <humanized_text> tags in your respons
       }
     );
   } catch (error) {
-    console.error('Error in humanize function:', error);
+    console.error('Error in humanize function:', error.message);
     return new Response(
-      JSON.stringify({ error: 'Failed to humanize text' }),
+      JSON.stringify({ 
+        error: 'Failed to humanize text',
+        details: error.message 
+      }),
       { 
         headers: {
           ...corsHeaders,
