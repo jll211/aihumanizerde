@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const Auth = () => {
             console.log("Checking if profile exists for user:", session.user.id);
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
-              .select()
+              .select('*')
               .eq('id', session.user.id)
               .single();
 
@@ -69,8 +70,8 @@ const Auth = () => {
                 .insert({
                   id: session.user.id,
                   username: session.user.email,
-                  updated_at: new Date().toISOString()
-                });
+                  updated_at: new Date().toISOString(),
+                } satisfies Database['public']['Tables']['profiles']['Insert']);
 
               if (insertError) {
                 console.error("Profile creation error:", insertError);
