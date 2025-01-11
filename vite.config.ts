@@ -10,14 +10,15 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react'
+      jsxRuntime: 'classic',
+      jsxImportSource: '@emotion/react'
     }),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react/jsx-runtime": "react/jsx-runtime.js"
     },
   },
   build: {
@@ -30,7 +31,8 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['react', 'react-dom'],
     esbuildOptions: {
-      target: 'es2020'
+      target: 'es2020',
+      jsx: 'automatic'
     }
   },
 }));
