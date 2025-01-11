@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { jsx as _jsx } from 'react/jsx-runtime'
 
 const {
   createContext,
   useState,
   useCallback,
   useEffect,
-  useContext
+  useContext,
+  createElement
 } = React
 
 export type Toast = {
@@ -60,10 +60,7 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const value = useToast()
-  return _jsx(ToastContext.Provider, {
-    value: value,
-    children: children
-  })
+  return createElement(ToastContext.Provider, { value: value }, children)
 }
 
 export function toast(props: Omit<Toast, "id">) {
