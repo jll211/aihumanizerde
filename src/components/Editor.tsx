@@ -36,7 +36,6 @@ const Editor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedType, setSelectedType] = useState<TextType>("standard");
   const [showSignupDialog, setShowSignupDialog] = useState(false);
-  const [hasUsedFreeTransformation, setHasUsedFreeTransformation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -57,18 +56,53 @@ const Editor = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Check for free transformation in localStorage
-  useEffect(() => {
-    const usedFree = localStorage.getItem("hasUsedFreeTransformation") === "true";
-    setHasUsedFreeTransformation(usedFree);
-  }, []);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
   };
 
   const handleSignup = () => {
-    navigate("/auth");
+    navigate("/register");
+  };
+
+  const checkFreeTransformation = async () => {
+    try {
+      // Get client IP from Supabase Edge Function
+      const { data: ipData, error: ipError } = await supabase.functions.invoke('get-client-ip');
+      
+      if (ipError) throw ipError;
+      
+      const clientIP = ipData.ip;
+      console.log('Client IP:', clientIP);
+
+      // Check if IP has been used before
+      const { data: existingTransformation, error: queryError } = await supabase
+        .from('free_transformations')
+        .select('id')
+        .eq('ip_address', clientIP)
+        .single();
+
+      if (queryError && queryError.code !== 'PGRST116') { // PGRST116 means no rows found
+        throw queryError;
+      }
+
+      if (existingTransformation) {
+        console.log('IP has already used free transformation');
+        return false;
+      }
+
+      // If IP hasn't been used, insert it
+      const { error: insertError } = await supabase
+        .from('free_transformations')
+        .insert([{ ip_address: clientIP }]);
+
+      if (insertError) throw insertError;
+
+      console.log('New IP recorded for free transformation');
+      return true;
+    } catch (error) {
+      console.error('Error checking free transformation:', error);
+      return false;
+    }
   };
 
   const handleHumanize = async () => {
@@ -82,9 +116,12 @@ const Editor = () => {
     }
 
     // Check if user needs to sign up
-    if (!session && hasUsedFreeTransformation) {
-      setShowSignupDialog(true);
-      return;
+    if (!session) {
+      const canUseFreeTrial = await checkFreeTransformation();
+      if (!canUseFreeTrial) {
+        setShowSignupDialog(true);
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -107,12 +144,6 @@ const Editor = () => {
       if (data && typeof data.humanizedText === 'string') {
         setOutput(data.humanizedText);
         
-        // If this was the free transformation, mark it as used
-        if (!session && !hasUsedFreeTransformation) {
-          localStorage.setItem("hasUsedFreeTransformation", "true");
-          setHasUsedFreeTransformation(true);
-        }
-
         toast({
           title: "Erfolg!",
           description: "Dein Text wurde erfolgreich humanisiert.",

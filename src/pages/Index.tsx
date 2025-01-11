@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, LogIn, UserPlus } from "lucide-react";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
 import Editor from "../components/Editor";
@@ -44,16 +44,37 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-muted to-background">
       <div className="p-6 flex justify-between items-center">
         <Logo />
-        {isAuthenticated && (
-          <Button
-            variant="ghost"
-            className="text-gray-400 hover:text-white"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5 mr-2" />
-            Abmelden
-          </Button>
-        )}
+        <div className="flex gap-4">
+          {isAuthenticated ? (
+            <Button
+              variant="ghost"
+              className="text-gray-400 hover:text-white"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Abmelden
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
+                onClick={() => navigate("/auth")}
+              >
+                <LogIn className="h-5 w-5 mr-2" />
+                Login
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
+                onClick={() => navigate("/register")}
+              >
+                <UserPlus className="h-5 w-5 mr-2" />
+                Registrieren
+              </Button>
+            </>
+          )}
+        </div>
       </div>
       
       <div className="max-w-6xl mx-auto px-4 py-20">
