@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.14.1'
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // Allow all origins for now
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 }
@@ -73,7 +73,61 @@ General guidelines for humanizing the text:
 9. Preserve the style and tone of the original, even if specific instructions below may state otherwise.
 10. Include 1-2 minimal grammar or spelling errors to enhance the human feel (but don't overdo it).
 
-Please provide only the humanized text without any additional commentary or explanations.`
+Specific instructions based on text type (apply these in addition to the general guidelines, not in place of them):
+
+For blog articles:
+- Use a conversational tone while maintaining professionalism.
+- Include personal anecdotes or examples where appropriate.
+- Break up long paragraphs into shorter, more digestible chunks.
+
+For professional/business emails:
+- Maintain a formal yet friendly tone.
+- Use appropriate salutations and closings.
+- Be concise and to the point while remaining polite.
+- Aim for short emails with a focus on clarity.
+- Keep salutation and closing as they were before.
+- Preserve the original German formal/informal address ('Du' or 'Sie').
+
+For academic texts:
+- Maintain a formal and objective tone.
+- Use field-specific terminology where necessary.
+- Rephrase content to avoid potential plagiarism issues.
+- Preserve citations and references.
+- Aim for a similar length and style while re-structuring sentences to avoid plagiarism.
+
+For social media posts:
+- Adapt the tone to fit the specific platform (e.g., more casual for Instagram, more professional for LinkedIn).
+- Keep the content concise and engaging.
+- Use hashtags sparingly and only when relevant.
+- Encourage interaction without being overly promotional.
+- Do not use emojis unless explicitly requested by the user.
+
+For standard text (without a specific text type):
+- Apply all general humanization guidelines.
+- Maintain the original tone and content of the text.
+- Adapt the language to sound natural and human-written without changing the overall style or purpose of the text.
+
+Before providing your final humanized version, analyze and plan your approach. Include your analysis and planning within <humanization_strategy> tags. In your analysis:
+a. Identify and list AI-typical phrases or structures you've found in the text
+b. Propose natural alternatives for each identified phrase or structure
+c. Plan how you'll vary sentence structure throughout the text
+d. Identify specific spots where you'll add informal language and minor errors
+e. Consider and note any German language-specific nuances you'll need to address
+f. List German-specific idioms or expressions that could be incorporated
+g. For blog articles, brainstorm personal anecdotes or examples that could be included
+h. Consider the target audience and how to adjust the language accordingly
+i. Outline a step-by-step approach for implementing your humanization strategy
+
+After your analysis, provide the humanized text inside <humanized_text> tags. Finally, include a brief explanation of the changes you made and how they improve the text's human-like quality inside <explanation> tags.
+
+Remember:
+1. Always preserve the original tone, style, and intent of the text, even if it conflicts with text-type-specific guidelines.
+2. Text-type-specific rules should complement, not override, the general guidelines.
+3. When no specific text type is selected, apply only the standard humanizing process using the general guidelines.
+
+Your goal is to create text that sounds natural and human-written while preserving the original meaning, intent, and tone.
+
+Please provide only the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
       }]
     });
 
@@ -82,9 +136,11 @@ Please provide only the humanized text without any additional commentary or expl
       responseLength: message.content.length
     });
 
-    // Extract the text content from the message
-    const humanizedText = message.content[0].text;
-    console.log('Humanized text:', humanizedText);
+    // Extract the humanized text from the response
+    const content = message.content[0].text;
+    const humanizedText = content.match(/<humanized_text>([\s\S]*?)<\/humanized_text>/)?.[1]?.trim() || content;
+    
+    console.log('Extracted humanized text:', humanizedText);
 
     return new Response(
       JSON.stringify({ humanizedText }),
