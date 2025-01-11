@@ -15,6 +15,7 @@ const AuthButtons = ({ isAuthenticated, setIsAuthenticated }: AuthButtonsProps) 
     console.log("Logging out...");
     await supabase.auth.signOut();
     setIsAuthenticated(false);
+    navigate("/"); // Redirect to homepage after logout
   };
 
   return (
