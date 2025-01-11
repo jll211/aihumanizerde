@@ -1,27 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.14.1'
 
-// Update CORS headers to allow requests from Netlify domain
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://tiny-mochi-8039ea.netlify.app',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Max-Age': '86400',
-};
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+}
 
 serve(async (req) => {
   console.log('Received request:', req.method, req.url);
   console.log('Request headers:', Object.fromEntries(req.headers.entries()));
 
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling CORS preflight request');
-    return new Response(null, {
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      }
-    });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -94,9 +85,9 @@ Please provide only the humanized text without any additional commentary or expl
     return new Response(
       JSON.stringify({ humanizedText: message.content }),
       { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json',
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
       }
     );
@@ -105,8 +96,8 @@ Please provide only the humanized text without any additional commentary or expl
     return new Response(
       JSON.stringify({ error: 'Failed to humanize text' }),
       { 
-        headers: { 
-          ...corsHeaders, 
+        headers: {
+          ...corsHeaders,
           'Content-Type': 'application/json'
         }, 
         status: 500 
