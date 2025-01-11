@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "../components/header/Header";
 import MainContent from "../components/home/MainContent";
 import Features from "../components/Features";
