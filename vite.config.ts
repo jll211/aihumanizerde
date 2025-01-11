@@ -10,16 +10,14 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      jsxImportSource: '@emotion/react',
-      plugins: [['@swc/plugin-emotion', {}]],
+      jsxImportSource: 'react',
+      tsDecorators: true,
     }),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react/jsx-runtime": "react/jsx-runtime.js",
-      "react/jsx-dev-runtime": "react/jsx-dev-runtime.js"
     },
   },
   build: {
@@ -38,8 +36,6 @@ export default defineConfig(({ mode }) => ({
     }
   },
   esbuild: {
-    jsxFactory: 'jsx',
-    jsxFragment: 'Fragment',
-    jsxInject: `import { jsx, Fragment } from 'react'`
+    jsx: 'automatic'
   }
 }));
