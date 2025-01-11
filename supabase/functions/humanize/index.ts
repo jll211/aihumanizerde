@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.14.1'
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://tiny-mochi-8039ea.netlify.app',
+  'Access-Control-Allow-Origin': '*', // Allow all origins for now
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 }
@@ -82,8 +82,12 @@ Please provide only the humanized text without any additional commentary or expl
       responseLength: message.content.length
     });
 
+    // Extract the text content from the message
+    const humanizedText = message.content[0].text;
+    console.log('Humanized text:', humanizedText);
+
     return new Response(
-      JSON.stringify({ humanizedText: message.content }),
+      JSON.stringify({ humanizedText }),
       { 
         headers: {
           ...corsHeaders,
