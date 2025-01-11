@@ -19,10 +19,12 @@ const Register = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          console.log("User already logged in, redirecting to homepage");
           navigate("/");
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        setErrorMessage("Ein Fehler ist beim Prüfen der Session aufgetreten.");
       } finally {
         setIsLoading(false);
       }
@@ -34,6 +36,7 @@ const Register = () => {
       async (event, session) => {
         console.log("Register state changed:", event, session);
         if (event === "SIGNED_IN") {
+          console.log("User registered and signed in, redirecting to homepage");
           toast({
             title: "Erfolgreich registriert",
             description: "Willkommen bei unserem Service!",
@@ -42,6 +45,7 @@ const Register = () => {
         } else if (event === "USER_UPDATED") {
           const { error } = await supabase.auth.getSession();
           if (error) {
+            console.error("Session error:", error);
             setErrorMessage(getErrorMessage(error));
           }
         }
@@ -52,14 +56,31 @@ const Register = () => {
   }, [navigate, toast]);
 
   const getErrorMessage = (error: AuthError) => {
+    console.error("Authentication error:", error);
+    
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
-          return "Ungültige E-Mail oder Passwort. Bitte überprüfen Sie Ihre Eingaben.";
+          if (error.message.includes("Email not confirmed")) {
+            return "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.";
+          }
+          if (error.message.includes("Password")) {
+            return "Das Passwort muss mindestens 6 Zeichen lang sein.";
+          }
+          if (error.message.includes("User already registered")) {
+            return "Diese E-Mail-Adresse wird bereits verwendet.";
+          }
+          return "Ungültige Eingaben. Bitte überprüfen Sie Ihre Daten.";
         case 422:
           return "Diese E-Mail-Adresse wird bereits verwendet.";
+        case 500:
+          return "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
         default:
-          return error.message;
+          if (error.message.includes("Database error")) {
+            console.error("Database error details:", error);
+            return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
+          }
+          return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
       }
     }
     return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
@@ -110,6 +131,7 @@ const Register = () => {
               divider: 'my-4',
               input: 'text-white bg-background',
               label: 'text-foreground',
+              message: 'text-destructive',
             }
           }}
           providers={["google"]}
