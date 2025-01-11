@@ -73,7 +73,7 @@ const Auth = () => {
             }
           }}
           providers={["google"]}
-          redirectTo="https://aihumanizerde.lovable.app"
+          redirectTo={window.location.origin}
           view="sign_in"
         />
       </div>
