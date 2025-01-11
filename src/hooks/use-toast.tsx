@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { jsx } from 'react/jsx-runtime';
+
 const {
   createContext,
   useState,
@@ -59,7 +61,7 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const value = useToast();
-  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
+  return jsx(ToastContext.Provider, { value: value, children: children });
 }
 
 export function toast(props: Omit<Toast, "id">) {
