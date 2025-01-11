@@ -44,7 +44,8 @@ const Index = () => {
   const handleLogout = async () => {
     console.log("Logging out...");
     await supabase.auth.signOut();
-    navigate("/auth");
+    // Instead of navigating to /auth, we stay on the homepage
+    setIsAuthenticated(false);
   };
 
   if (isLoading) {
