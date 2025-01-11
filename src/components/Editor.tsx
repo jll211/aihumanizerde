@@ -21,6 +21,9 @@ const TEXT_TYPES = {
 
 type TextType = keyof typeof TEXT_TYPES;
 
+// Get the API URL from environment variables, fallback to localhost for development
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const Editor = () => {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -44,7 +47,8 @@ const Editor = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/humanize", {
+      console.log('Making request to:', `${API_URL}/api/humanize`);
+      const response = await fetch(`${API_URL}/api/humanize`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,19 +1,19 @@
 import express from 'express';
+import cors from 'cors';
 import apiRoutes from './api';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Enable CORS with proper configuration
+app.use(cors({
+  origin: '*', // In production, you should specify the exact origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Middleware to parse JSON bodies
 app.use(express.json());
-
-// Enable CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  next();
-});
 
 // Mount API routes
 app.use('/api', apiRoutes);
