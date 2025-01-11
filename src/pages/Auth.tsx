@@ -24,6 +24,7 @@ const Auth = () => {
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        setErrorMessage("Ein Fehler ist beim Prüfen der Session aufgetreten.");
       } finally {
         setIsLoading(false);
       }
@@ -46,6 +47,7 @@ const Auth = () => {
         } else if (event === "USER_UPDATED") {
           const { error } = await supabase.auth.getSession();
           if (error) {
+            console.error("Session error:", error);
             setErrorMessage(getErrorMessage(error));
           }
         }
@@ -56,16 +58,36 @@ const Auth = () => {
   }, [navigate, toast]);
 
   const getErrorMessage = (error: AuthError) => {
+    console.error("Authentication error:", error);
+    
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
-          return "Ungültige E-Mail oder Passwort. Bitte überprüfen Sie Ihre Eingaben.";
+          if (error.message.includes("Email not confirmed")) {
+            return "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.";
+          }
+          if (error.message.includes("Password")) {
+            return "Das Passwort muss mindestens 6 Zeichen lang sein.";
+          }
+          if (error.message.includes("User already registered")) {
+            return "Diese E-Mail-Adresse wird bereits verwendet.";
+          }
+          if (error.message.includes("Invalid login credentials")) {
+            return "Ungültige E-Mail oder Passwort.";
+          }
+          return "Ungültige Eingaben. Bitte überprüfen Sie Ihre Daten.";
         case 422:
-          return "Bitte bestätigen Sie Ihre E-Mail-Adresse.";
+          return "Diese E-Mail-Adresse wird bereits verwendet.";
         case 401:
           return "Ungültige Anmeldedaten.";
+        case 500:
+          return "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
         default:
-          return error.message;
+          if (error.message.includes("Database error")) {
+            console.error("Database error details:", error);
+            return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
+          }
+          return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
       }
     }
     return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
@@ -116,6 +138,7 @@ const Auth = () => {
               divider: 'my-4',
               input: 'text-white bg-background',
               label: 'text-foreground',
+              message: 'text-destructive',
             }
           }}
           providers={["google"]}
