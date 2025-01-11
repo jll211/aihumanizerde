@@ -12,21 +12,15 @@ export const supabase = createClient<Database>(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
+      storageKey: 'auth-token',
       storage: {
-        getItem: (key) => {
-          const item = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith(`${key}=`))
-            ?.split('=')[1];
-          return item ? JSON.parse(decodeURIComponent(item)) : null;
-        },
-        setItem: (key, value) => {
-          document.cookie = `${key}=${encodeURIComponent(JSON.stringify(value))}; path=/; domain=.lovable.app; samesite=lax`;
-        },
-        removeItem: (key) => {
-          document.cookie = `${key}=; path=/; domain=.lovable.app; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-        },
-      },
-    },
+        type: 'cookie',
+        options: {
+          path: '/',
+          domain: '.lovable.app',
+          sameSite: 'lax'
+        }
+      }
+    }
   }
 );
