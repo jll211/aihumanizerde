@@ -60,7 +60,7 @@ const Register = () => {
             }
           }}
           providers={["google"]}
-          redirectTo={typeof window !== 'undefined' ? window.location.origin : 'https://aihumanizerde.lovable.app'}
+          redirectTo={window.location.origin}
           view="sign_up"
         />
       </div>

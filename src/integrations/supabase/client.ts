@@ -8,11 +8,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 const getCurrentDomain = () => {
   if (typeof window === 'undefined') return '';
   const hostname = window.location.hostname;
-  
-  // Handle different environments
-  if (hostname.includes('localhost')) return 'localhost';
-  if (hostname.includes('preview--')) return hostname;
-  return 'aihumanizerde.lovable.app';
+  return hostname.includes('localhost') ? 'localhost' : hostname;
 };
 
 export const supabase = createClient<Database>(
