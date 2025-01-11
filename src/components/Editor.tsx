@@ -3,12 +3,29 @@ import { motion } from "framer-motion";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
 import { Button } from "./ui/button";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+const TEXT_TYPES = {
+  standard: "Standard",
+  blog: "Blogartikel",
+  social: "Social Media Post",
+  academic: "Akademischer Text",
+  business: "Geschäftliche E-Mail",
+} as const;
+
+type TextType = keyof typeof TEXT_TYPES;
 
 const Editor = () => {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedType, setSelectedType] = useState<TextType>("standard");
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -32,7 +49,10 @@ const Editor = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: input }),
+        body: JSON.stringify({ 
+          text: input,
+          type: selectedType 
+        }),
       });
 
       if (!response.ok) {
@@ -65,6 +85,28 @@ const Editor = () => {
       transition={{ duration: 0.5 }}
       className="max-w-7xl mx-auto p-6"
     >
+      <div className="mb-6 flex justify-start">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-48">
+              {TEXT_TYPES[selectedType]}
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            {Object.entries(TEXT_TYPES).map(([key, value]) => (
+              <DropdownMenuItem
+                key={key}
+                onClick={() => setSelectedType(key as TextType)}
+                className="cursor-pointer"
+              >
+                {value}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-8">
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
