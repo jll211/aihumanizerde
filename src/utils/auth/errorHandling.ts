@@ -19,7 +19,11 @@ export const getErrorMessage = (error: AuthError) => {
       case 422:
         return "Diese E-Mail-Adresse wird bereits verwendet.";
       case 500:
-        return "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
+        if (error.message.includes("Database error")) {
+          console.error("Database error details:", error);
+          return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
+        }
+        return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
       default:
         if (error.message.includes("Database error")) {
           console.error("Database error details:", error);

@@ -15,7 +15,8 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Register state changed:", event, session);
+        console.log("Auth state changed:", event, session);
+        
         if (event === "SIGNED_IN") {
           try {
             if (!session?.user?.id) {
@@ -59,10 +60,15 @@ export const AuthStateHandler = ({ setErrorMessage }: AuthStateHandlerProps) => 
             navigate("/");
           } catch (error) {
             console.error("Error during sign in process:", error);
-            setErrorMessage("Ein Fehler ist bei der Profilverarbeitung aufgetreten.");
+            const errorMsg = error instanceof Error ? error.message : "Ein unerwarteter Fehler ist aufgetreten";
+            setErrorMessage(`Fehler bei der Registrierung: ${errorMsg}`);
             await supabase.auth.signOut();
           }
+        } else if (event === "SIGNED_OUT") {
+          console.log("User signed out");
+          setErrorMessage("");
         } else if (event === "USER_UPDATED") {
+          console.log("User updated");
           const { error } = await supabase.auth.getSession();
           if (error) {
             console.error("Session error:", error);
