@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
 import { Button } from "./ui/button";
 import { Loader2, Sparkles, ChevronDown } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "./ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const TEXT_TYPES = {
   standard: "Standard",
@@ -27,10 +35,40 @@ const Editor = () => {
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedType, setSelectedType] = useState<TextType>("standard");
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
+  const [hasUsedFreeTransformation, setHasUsedFreeTransformation] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Check if user is logged in
+  const [session, setSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(!!session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Check for free transformation in localStorage
+  useEffect(() => {
+    const usedFree = localStorage.getItem("hasUsedFreeTransformation") === "true";
+    setHasUsedFreeTransformation(usedFree);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
+  };
+
+  const handleSignup = () => {
+    navigate("/auth");
   };
 
   const handleHumanize = async () => {
@@ -40,6 +78,12 @@ const Editor = () => {
         description: "Bitte gib einen Text ein.",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check if user needs to sign up
+    if (!session && hasUsedFreeTransformation) {
+      setShowSignupDialog(true);
       return;
     }
 
@@ -60,10 +104,15 @@ const Editor = () => {
 
       console.log('Received response:', data);
 
-      // Make sure we're accessing the humanizedText property from the response
       if (data && typeof data.humanizedText === 'string') {
         setOutput(data.humanizedText);
         
+        // If this was the free transformation, mark it as used
+        if (!session && !hasUsedFreeTransformation) {
+          localStorage.setItem("hasUsedFreeTransformation", "true");
+          setHasUsedFreeTransformation(true);
+        }
+
         toast({
           title: "Erfolg!",
           description: "Dein Text wurde erfolgreich humanisiert.",
@@ -85,81 +134,99 @@ const Editor = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-7xl mx-auto p-6"
-    >
-      <div className="mb-6 flex justify-start">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-48 bg-background border-gray-800">
-              {TEXT_TYPES[selectedType]}
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 bg-background border-gray-800">
-            {Object.entries(TEXT_TYPES).map(([key, value]) => (
-              <DropdownMenuItem
-                key={key}
-                onClick={() => setSelectedType(key as TextType)}
-                className="cursor-pointer"
-              >
-                {value}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        <motion.div 
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
-        >
-          <h3 className="text-lg font-semibold mb-4 text-blue-400 tracking-tight">Original</h3>
-          <Textarea
-            className="w-full h-[600px] bg-background border-gray-800 rounded-lg resize-none font-mono text-sm"
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Füge deinen KI-generierten Text hier ein..."
-          />
-        </motion.div>
-        <motion.div 
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
-        >
-          <h3 className="text-lg font-semibold mb-4 text-purple-400 tracking-tight">Humanisiert</h3>
-          <div className="w-full h-[600px] bg-background border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
-            {output || "Dein humanisierter Text erscheint hier..."}
-          </div>
-        </motion.div>
-      </div>
+    <>
       <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-8 flex justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto p-6"
       >
-        <Button 
-          onClick={handleHumanize} 
-          disabled={isLoading}
-          className="group px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full text-lg font-semibold tracking-tight transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
+        <div className="mb-6 flex justify-start">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-48 bg-background border-gray-800">
+                {TEXT_TYPES[selectedType]}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48 bg-background border-gray-800">
+              {Object.entries(TEXT_TYPES).map(([key, value]) => (
+                <DropdownMenuItem
+                  key={key}
+                  onClick={() => setSelectedType(key as TextType)}
+                  className="cursor-pointer"
+                >
+                  {value}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <motion.div 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          >
+            <h3 className="text-lg font-semibold mb-4 text-blue-400 tracking-tight">Original</h3>
+            <Textarea
+              className="w-full h-[600px] bg-background border-gray-800 rounded-lg resize-none font-mono text-sm"
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Füge deinen KI-generierten Text hier ein..."
+            />
+          </motion.div>
+          <motion.div 
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="bg-background rounded-xl p-6 border border-gray-800 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          >
+            <h3 className="text-lg font-semibold mb-4 text-purple-400 tracking-tight">Humanisiert</h3>
+            <div className="w-full h-[600px] bg-background border border-gray-800 rounded-lg p-4 font-mono text-sm overflow-y-auto whitespace-pre-wrap">
+              {output || "Dein humanisierter Text erscheint hier..."}
+            </div>
+          </motion.div>
+        </div>
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8 flex justify-center"
         >
-          {isLoading ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          ) : (
-            <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-          )}
-          Text humanisieren
-        </Button>
+          <Button 
+            onClick={handleHumanize} 
+            disabled={isLoading}
+            className="group px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-full text-lg font-semibold tracking-tight transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
+          >
+            {isLoading ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+            )}
+            Text humanisieren
+          </Button>
+        </motion.div>
       </motion.div>
-    </motion.div>
+
+      <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Kostenlose Transformation verbraucht</DialogTitle>
+            <DialogDescription>
+              Du hast deine kostenlose Transformation bereits verwendet. Registriere dich jetzt, um unbegrenzt Texte zu humanisieren!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-4">
+            <Button onClick={handleSignup} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              Jetzt registrieren
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
