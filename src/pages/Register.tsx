@@ -17,7 +17,14 @@ const Register = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Checking session...");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session check error:", sessionError);
+          throw sessionError;
+        }
+        
         if (session) {
           console.log("User already logged in, redirecting to homepage");
           navigate("/");
@@ -36,12 +43,52 @@ const Register = () => {
       async (event, session) => {
         console.log("Register state changed:", event, session);
         if (event === "SIGNED_IN") {
-          console.log("User registered and signed in, redirecting to homepage");
-          toast({
-            title: "Erfolgreich registriert",
-            description: "Willkommen bei unserem Service!",
-          });
-          navigate("/");
+          try {
+            if (!session?.user?.id) {
+              console.error("No user ID in session");
+              throw new Error("No user ID found in session");
+            }
+
+            console.log("Checking if profile exists for user:", session.user.id);
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+
+            if (profileError) {
+              console.error("Profile check error:", profileError);
+              throw profileError;
+            }
+
+            if (!profile) {
+              console.log("Creating new profile for user:", session.user.id);
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert([{ 
+                  id: session.user.id, 
+                  username: session.user.email,
+                  updated_at: new Date().toISOString()
+                }]);
+
+              if (insertError) {
+                console.error("Profile creation error:", insertError);
+                throw insertError;
+              }
+            }
+
+            console.log("Sign in process completed successfully");
+            toast({
+              title: "Erfolgreich registriert",
+              description: "Willkommen bei unserem Service!",
+            });
+            navigate("/");
+          } catch (error) {
+            console.error("Error during sign in process:", error);
+            setErrorMessage("Ein Fehler ist bei der Profilverarbeitung aufgetreten.");
+            // Attempt to sign out the user if profile creation failed
+            await supabase.auth.signOut();
+          }
         } else if (event === "USER_UPDATED") {
           const { error } = await supabase.auth.getSession();
           if (error) {
@@ -52,7 +99,10 @@ const Register = () => {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, [navigate, toast]);
 
   const getErrorMessage = (error: AuthError) => {
