@@ -77,8 +77,10 @@ Your goal is to make the text sound as if it were written by a human, while main
 6. Implement the strategy to produce the humanized text.
 7. Provide an explanation of the changes made.
 
+Do not write introductions or add any other text parts to the output. 
+
 General guidelines for humanizing the text:
-1. Remove all AI-typical elements, sentence structures, phrasings, and tonality.
+1. Remove all AI-typical elements, emojis, sentence structures, phrasings, and tonality.
 2. Simplify sentence structure and vary sentence length for a more natural flow.
 3. Use active voice and simple, easy-to-understand word choices.
 4. Ensure good readability for the average person ("Otto Normalverbraucher").
@@ -141,9 +143,7 @@ Remember:
 2. Text-type-specific rules should complement, not override, the general guidelines.
 3. When no specific text type is selected, apply only the standard humanizing process using the general guidelines.
 
-Your goal is to create text that sounds natural and human-written while preserving the original meaning, intent, and tone.
-
-Please provide only the content within the <humanized_text> tags in your response, without any additional commentary or explanations.`
+Your goal is to create text that sounds natural and human-written while preserving the original meaning, intent, and tone.`
       }]
     });
 
