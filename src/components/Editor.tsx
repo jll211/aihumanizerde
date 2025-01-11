@@ -27,6 +27,7 @@ const Editor = () => {
 
     setIsLoading(true);
     try {
+      // Use the correct API endpoint
       const response = await fetch("/api/humanize", {
         method: "POST",
         headers: {
