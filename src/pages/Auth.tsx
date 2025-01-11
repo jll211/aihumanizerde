@@ -14,6 +14,7 @@ const Auth = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        console.log("User already logged in, redirecting to homepage");
         navigate("/");
       }
     };
@@ -24,11 +25,15 @@ const Auth = () => {
       async (event, session) => {
         console.log("Auth state changed:", event, !!session);
         if (event === "SIGNED_IN") {
+          console.log("User signed in, redirecting to homepage");
           navigate("/");
           toast({
             title: "Erfolgreich eingeloggt",
             description: "Willkommen zurück!",
           });
+        } else if (event === "SIGNED_OUT") {
+          console.log("User signed out, staying on homepage");
+          navigate("/");
         }
       }
     );
