@@ -7,27 +7,31 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Received request:', req.method, req.url);
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    console.log('Handling CORS preflight request');
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, type = 'standard' } = await req.json()
+    const { text, type = 'standard' } = await req.json();
+    console.log('Processing request with:', { type, textLength: text?.length });
 
     if (!text) {
+      console.error('Missing text in request');
       return new Response(
         JSON.stringify({ error: 'Text is required' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
+      );
     }
-
-    console.log('Received request:', { type, textLength: text.length });
 
     const anthropic = new Anthropic({
       apiKey: Deno.env.get('ANTHROPIC_API_KEY'),
     });
 
+    console.log('Sending request to Anthropic...');
     const message = await anthropic.messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 4096,
@@ -73,20 +77,20 @@ Please provide only the humanized text without any additional commentary or expl
       }]
     });
 
-    console.log('Anthropic response received:', { 
+    console.log('Received response from Anthropic:', {
       status: 'success',
-      responseLength: message.content.length 
+      responseLength: message.content.length
     });
 
     return new Response(
       JSON.stringify({ humanizedText: message.content }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in humanize function:', error);
     return new Response(
       JSON.stringify({ error: 'Failed to humanize text' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    )
+    );
   }
-})
+});

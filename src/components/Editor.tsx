@@ -45,6 +45,7 @@ const Editor = () => {
 
     setIsLoading(true);
     try {
+      console.log('Sending request to humanize function...');
       const { data, error } = await supabase.functions.invoke('humanize', {
         body: { 
           text: input,
@@ -52,7 +53,12 @@ const Editor = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      console.log('Received response:', data);
 
       // Make sure we're accessing the humanizedText property from the response
       if (data && typeof data.humanizedText === 'string') {
@@ -63,6 +69,7 @@ const Editor = () => {
           description: "Dein Text wurde erfolgreich humanisiert.",
         });
       } else {
+        console.error('Invalid response format:', data);
         throw new Error('Invalid response format from server');
       }
     } catch (error) {
