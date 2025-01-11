@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +10,19 @@ const Register = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Register state changed:", event, !!session);
         if (event === "SIGNED_IN") {
           navigate("/");
           toast({
@@ -34,6 +45,12 @@ const Register = () => {
           </h2>
           <p className="mt-2 text-sm text-gray-400">
             Erstelle ein Konto und transformiere unbegrenzt Texte
+          </p>
+          <p className="mt-4 text-sm text-gray-400">
+            Bereits registriert?{" "}
+            <Link to="/auth" className="text-blue-400 hover:text-blue-300">
+              Jetzt einloggen
+            </Link>
           </p>
         </div>
         

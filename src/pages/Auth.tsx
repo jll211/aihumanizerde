@@ -10,8 +10,19 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, !!session);
         if (event === "SIGNED_IN") {
           navigate("/");
           toast({
@@ -62,7 +73,7 @@ const Auth = () => {
             }
           }}
           providers={["google"]}
-          redirectTo={window.location.origin}
+          redirectTo="https://aihumanizerde.lovable.app"
           view="sign_in"
         />
       </div>
