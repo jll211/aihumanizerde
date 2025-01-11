@@ -22,9 +22,7 @@ const TEXT_TYPES = {
 type TextType = keyof typeof TEXT_TYPES;
 
 // In development, use the Supabase Edge Function URL
-const API_URL = import.meta.env.PROD 
-  ? 'https://akbfexwiejfddvjmeofn.supabase.co/functions/v1/humanize'
-  : 'http://localhost:3000/api/humanize';
+const API_URL = 'https://akbfexwiejfddvjmeofn.supabase.co/functions/v1/humanize';
 
 const Editor = () => {
   const [input, setInput] = useState("");

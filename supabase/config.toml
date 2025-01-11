@@ -1,1 +1,2 @@
-project_id = "akbfexwiejfddvjmeofn"
+[functions.humanize]
+verify_jwt = false
