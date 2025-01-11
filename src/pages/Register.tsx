@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
-const Auth = () => {
+const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -15,8 +15,8 @@ const Auth = () => {
         if (event === "SIGNED_IN") {
           navigate("/");
           toast({
-            title: "Erfolgreich eingeloggt",
-            description: "Willkommen zurück!",
+            title: "Erfolgreich registriert",
+            description: "Willkommen bei unserem Service!",
           });
         }
       }
@@ -30,16 +30,10 @@ const Auth = () => {
       <div className="w-full max-w-md space-y-8 bg-background/80 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
-            Willkommen zurück
+            Jetzt registrieren
           </h2>
           <p className="mt-2 text-sm text-gray-400">
-            Melde dich an, um deine Texte zu humanisieren
-          </p>
-          <p className="mt-4 text-sm text-gray-400">
-            Neu hier?{" "}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300">
-              Jetzt registrieren
-            </Link>
+            Erstelle ein Konto und transformiere unbegrenzt Texte
           </p>
         </div>
         
@@ -63,11 +57,11 @@ const Auth = () => {
           }}
           providers={["google"]}
           redirectTo={window.location.origin}
-          view="sign_in"
+          view="sign_up"
         />
       </div>
     </div>
   );
 };
 
-export default Auth;
+export default Register;
