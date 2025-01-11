@@ -75,6 +75,9 @@ const Auth = () => {
           if (error.message.includes("Invalid login credentials")) {
             return "Ungültige E-Mail oder Passwort.";
           }
+          if (error.message.includes("Database error")) {
+            return "Ein Fehler ist bei der Profilserstellung aufgetreten. Bitte versuchen Sie es später erneut.";
+          }
           return "Ungültige Eingaben. Bitte überprüfen Sie Ihre Daten.";
         case 422:
           return "Diese E-Mail-Adresse wird bereits verwendet.";
